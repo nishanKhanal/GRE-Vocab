@@ -17,6 +17,8 @@ pillow = "*"
 gunicorn = "*"
 whitenoise = "*"
 python-dotenv = "*"
+django-heroku = "*"
+django-cloudinary-storage = "*"
 
 [dev-packages]
 ipykernel = "*"

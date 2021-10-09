@@ -51,6 +51,7 @@ class Word(ModelWithTimeStamp):
         # Opening the uploaded image
         try:
             im = Image.open(self.image)
+            im = im.convert('RGB')
             output = BytesIO()
 
             # after modifications, save it to the output

@@ -54,6 +54,9 @@ INSTALLED_APPS = [
     'django_select2',
     'django_extensions',
     'table',
+
+    'cloudinary_storage',
+    'cloudinary',
 ]
 
 MIDDLEWARE = [
@@ -176,3 +179,8 @@ MICROSOFT_TRANSLATE_XRAPID_API_KEY = os.environ.get('MICROSOFT_TRANSLATE_XRAPID_
 # import os
 # os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
+if os.environ.get('PRODUCTION') == "True":
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+    import django_heroku
+    django_heroku.settings(locals())
