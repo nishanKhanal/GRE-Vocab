@@ -1,0 +1,86 @@
+{% extends 'base.html' %} {% comment %} {% extends 'base.html' %} {% block
+content %}
+<div class="card text-white bg-dark mb-3">
+  <div class="card-header">
+    <h1>{{ word.word }}</h1>
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">{{ word.meaning }}</h5>
+    <p class="card-text">{{ word.example}}</p>
+    <div class="row">
+      <div class="col-sm-6">
+        <div class="card text-success bg-dark border-success mb-3">
+          <div class="card-header">Synonyms</div>
+          <div class="card-body text-success">
+            <h5 class="card-title">Success card title</h5>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <div class="card text-danger bg-dark border-danger mb-3">
+          <div class="card-header">Antonyms</div>
+          <div class="card-body text-danger">
+            <h5 class="card-title">Danger card title</h5>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %} {% endcomment %} 
+{% block content %}
+<div class="card bg-dark mb-3">
+  <div class="card-header">
+    <h1>{{ word.word }}</h1>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-sm-8">
+        <div class="card-body">
+          <h5 class="card-title">{{ word.meaning }}</h5>
+          <p class="card-text"><i>{{ word.example}}</i></p>
+          <p class="card-text">{{ word.translation}}</p>
+        </div>
+      </div>
+      <div class="col-sm-4">
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="card text-success bg-dark border-success mb-3">
+              <div class="card-header">Synonyms</div>
+              <div class="card-body text-success">
+                <h5 class="card-title">
+                {% for synonym in word.synonyms.all  %}
+                        <a class="text-success text-underlined" href={% url "words:word_detail" synonym.id %} style="text-decoration: none;"><u>{{ synonym.word }}</u></a> {% if not forloop.last %}| {% endif %} 
+                    {% endfor %}
+                </h5>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-12">
+            <div class="card text-warning bg-dark border-warning mb-3">
+              <div class="card-header">Antonyms</div>
+              <div class="card-body text-warning">
+                <h5 class="card-title">
+                    {% for antonym in word.antonyms.all  %}
+                        <a class="text-warning" href={% url "words:word_detail" antonym.id %} style="text-decoration: none;">{{ antonym.word }}</a> {% if not forloop.last %}| {% endif %} 
+                    {% endfor %}
+                </h5>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card-footer">
+    <div class="row">
+        <div class="col-sm-6 mb-1">
+            <a href={% url "words:word_update" word.id %}><button class="btn btn-outline-info col-12" > Edit</button></a>
+        </div>
+        <div class="col-sm-6 ">
+            <a href={% url "words:word_update" word.id %}><button class="btn btn-outline-danger col-12"> Delete</button> </a>
+        </div>
+    </div>
+  </div>
+  </div>
+  {% endblock content %}

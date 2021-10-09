@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+
+{% load humanize %}
+
+{% block title %}Cards{% endblock title %}
+
+{% block content %}
+    <div class="row">
+        {% for word in word_list %}
+            <div class="col-12 col-md-6 col-lg-6 mb-2">
+                <div class="card mx-auto bg-dark ">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-8 text-left">
+                                <form action="{% url 'words:word_partial_update' word.id %}" class="form-inline" method="POST">
+                                <h1 style="display: inline;">{{ word.word }}</h1> 
+                                {% csrf_token %}
+                                        <input type="hidden" name="next" value="{{ request.path }}?page={{request.GET.page}}">
+                                        <input type="hidden" name="favourite" value={% if word.favourite == False %} "1" {% else %} "" {% endif %} />
+                                    <button class="btn btn-outline-{% if word.favourite == False %}secondary{% else %}warning{% endif %} mb-2" style="border: none;"><i class="fa fa-star" aria-hidden="true"></i></button>
+                                </form> 
+                                <h5 style="display: inline;">{{ word.word_translation }}</h5> 
+
+                            </div>
+                            <div class="col-4 mb-1 pt-2 text-end">
+
+                                <form action="{% url 'words:word_delete' word.id %}" class="form-inline" method="POST">
+                                {% csrf_token %}
+                                    <input type="hidden" name="next" value="{{ request.path }}">
+                                    <a href={% url "words:word_update" word.id %} class="btn btn-outline-info mr-auto"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                                    <button class="btn btn-outline-danger mr-auto"><i class="fa fa-trash" aria-hidden="true"></i></button>
+                                </form> 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="card-body">
+                                    <span class="text-muted"> {{ word.part_of_speech }} </span>&nbsp;&nbsp;<h5 class="card-title" style="display: inline-block;">{{ word.meaning }} {% if word.meaning_translation %}
+                                    ({{ word.meaning_translation }})
+                                    {% endif %} </h5>
+                                    {% with word.example|linebreaks as word_examples%}
+                                    <p class="card-text"><i>
+                                        {% for token in word_examples.split %}
+                                           {% autoescape off %}
+                                                {% if word.word|slice:-2 in token %}
+                                                    <span class="text-light"><u><b>{{ token }}</b></u></span>
+                                                {% else %}
+                                                    {{ token }}
+                                                {% endif %}
+                                           {% endautoescape %}
+                                        {% endfor %}
+                                    </i></p>
+                                    {% endwith%}
+                                    {% comment %} <p class="card-text"><i>{{ word.example|linebreaks}}</i></p> {% endcomment %}
+                                    <p class="card-text">{{ word.translation}}</p>
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <div class="row">
+                                {% if word.terms_from_arts_sciences_and_social_sciences != "" and word.terms_from_arts_sciences_and_social_sciences is not None  %}
+                                 <div class="col-sm-12">
+                                        <div class="card text-info bg-dark border-info mb-3">
+                                            <div class="card-header">Terms from the Arts, Sciences, and Social Sciences</div>
+                                            <div class="card-body text-info">
+                                                {{ word.terms_from_arts_sciences_and_social_sciences|linebreaks }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                {% if word.image %}
+                                 <div class="col-sm-12">
+                                        <div class="card justify-content-center text-warning bg-dark border-warning mb-3">
+                                            <div class="card-header">Image</div>
+                                            <div class="card-body text-center">
+                                               <img src={{ word.image.url }} style="max-width: 100%; margin: auto"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                {% if word.synonyms.count > 0 %}
+                                    <div class="col-sm-12">
+                                        <div class="card text-success bg-dark border-success mb-3">
+                                            <div class="card-header">Synonyms</div>
+                                            <div class="card-body text-success">
+                                                <h5 class="card-title">
+                                                {% for synonym in word.synonyms.all  %}
+                                                        <a class="text-success text-underlined" href={% url "words:word_detail" synonym.id %} style="text-decoration: none;"><u>{{ synonym.word }}</u></a> {% if not forloop.last %}| {% endif %} 
+                                                    {% endfor %}
+                                                </h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                {% if word.antonyms.count > 0 %}
+                                    <div class="col-sm-12">
+                                        <div class="card text-danger bg-dark border-danger mb-3">
+                                            <div class="card-header">Antonyms</div>
+                                            <div class="card-body text-danger">
+                                                <h5 class="card-title">
+                                                    {% for antonym in word.antonyms.all  %}
+                                                        <a class="text-danger" href={% url "words:word_detail" antonym.id %} style="text-decoration: none;">{{ antonym.word }}</a> {% if not forloop.last %}| {% endif %} 
+                                                    {% endfor %}
+                                                </h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-12 text-danger">
+                            <div class="row justify-content-center">
+                                <div class="col-1 p-0 text-center">
+                                <form action="{% url 'words:word_partial_update' word.id %}" class="form-inline" method="POST">
+                                    {% csrf_token %}
+                                        <input type="hidden" name="translate"/>
+                                        <input type="hidden" name="next" value="{{ request.path }}">
+                                        <button class="btn btn-outline-light mb-2" style="border: none;"><i class="fa fa-language" aria-hidden="true"></i></button>
+                                </form> 
+                                </div>
+                                {% for _ in '0123456789'|make_list %}
+                                <div class="col-1 p-0 text-center">
+                                    <form class="form-inline" action={% url 'words:word_partial_update' word.pk %} method="POST">
+                                    {% csrf_token %}
+                                        <input type="hidden" name="next" value="{{ request.path }}">
+                                        <input type="hidden" name="difficulty" value="{{ forloop.counter }}">
+                                    {% if forloop.counter <= word.difficulty %}
+                                            <button type="submit" class="btn btn-outline-danger" style="border: none;"><i class="fa fa-circle" aria-hidden="true"></i></button>
+                                    {% else %}
+                                        <button type="submit" class="btn btn-outline-danger" style="border: none;"><i class="fa fa-circle-thin" aria-hidden="true"></i></button>
+                                    {% endif %}
+                                    </form>
+                                </div>
+                                {% endfor %}
+                                <div class="col-1 p-0 text-center">
+                                 <form action="{% url 'words:word_partial_update' word.id %}" class="form-inline" method="POST">
+                                    {% csrf_token %}
+                                        <input type="hidden" name="last_read_at"/>
+                                        <input type="hidden" name="next" value="{{ request.path }}?page={{request.GET.page}}">
+                                        <button class="btn btn-outline-{% if word.last_read_at %}info{% else %}secondary{% endif %} mb-2" style="border: none;"><i class="fa fa-eye" aria-hidden="true"></i></button>
+                                </form> 
+                                </div>
+                            </div>
+                            </div>
+                            <div class="col-12">
+                                <p class="text-end text-muted"> {% if word.source %} Source: {{ word.source.name }} | {% endif %}  {% if word.unit %} Unit: {{ word.unit }} | {% endif %} updated {{ word.updated_at|naturaltime }} </p>
+                            </div>
+                        </div>
+                       
+                    </div>
+                    </div>
+            </div>
+        {% endfor %}
+    </div>
+
+{% comment %} Pagination {% endcomment %}
+
+{% if page_obj %}
+<nav aria-label="Page navigation example ">
+  <ul class="pagination justify-content-end ">
+    {% if page_obj.has_previous  %}
+        <li class="page-item">
+            <a class="page-link bg-dark text-white" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        </li>
+        <li class="page-item"><a class="page-link bg-dark text-white" href="?page={{ page_obj.previous_page_number }}">{{ page_obj.number|add:"-1" }}</a></li>
+    {% else %}
+        <li class="page-item disabled">
+          <a class="page-link bg-dark text-muted" href="#" tabindex="-1">Previous</a>
+        </li>
+    {% endif %}
+
+    <li class="page-item "><a style="background: #1a1a1a;" class="page-link text-white" href="">{{ page_obj.number }}</a></li>
+
+
+    {% if page_obj.has_next %}
+    <li class="page-item"><a class="page-link bg-dark text-white" href="?page={{ page_obj.next_page_number }}">{{ page_obj.number|add:"1" }}</a></li>
+        <li class="page-item">
+            <a class="page-link bg-dark text-white" href="?page={{ page_obj.next_page_number }}&search={{ search_string }}">Next</a>
+        </li>
+    {% else %}
+        <li class="page-item disabled">
+          <a class="page-link bg-dark text-muted" href="#" tabindex="-1">Next</a>
+        </li>
+    {% endif %}
+  </ul>
+</nav>
+{% else %}
+{% endif %}
+
+{% endblock content %}

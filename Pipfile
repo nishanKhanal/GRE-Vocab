@@ -1,0 +1,25 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+django = "*"
+django-crispy-forms = "*"
+django-select2 = "*"
+django-redis = "*"
+django-pymemcache = "*"
+requests = "*"
+django-extensions = "*"
+notebook = "*"
+django-datatable = "*"
+pillow = "*"
+gunicorn = "*"
+whitenoise = "*"
+python-dotenv = "*"
+
+[dev-packages]
+ipykernel = "*"
+
+[requires]
+python_version = "3.8"

@@ -1,0 +1,1 @@
+web: gunicorn vocab.wsgi --log-file -

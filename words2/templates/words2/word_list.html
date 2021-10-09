@@ -1,0 +1,35 @@
+{% extends "base.html" %} 
+{% load tz %}
+{% load humanize %}
+{% block content %}
+<h1>hello</h1>
+<table class="table table-dark table-striped">
+  <thead>
+    <tr>
+      <th>Word</th>
+      <th>Meaning</th>
+      <th>Synonyms</th>
+      <th>Antonyms</th>
+      <th>Example</th>
+      <th>Translation</th>
+      <th>Created At</th>
+    </tr>
+  </thead>
+  {% for word in word_list %}
+  <tr>
+    <td>{{ word.word }}</td>
+    <td>{{ word.meaning }}</td>
+    <td>
+      {% for synonym in word.synonyms.all %} {{synonym.word }} {% endfor %}
+    </td>
+    <td>
+      {% for antonym in word.antonyms.all %} {{antonym.word }} {% endfor %}
+    </td>
+    <td>{{ word.example }}</td>
+    <td>{{ word.translation }}</td>
+    <td> {{ word.created_at|naturaltime }}</td>
+   {% comment %} <td> {% timezone "Asia/Kathmandu" %}  {{ word.created_at }} {% endtimezone %} </td> {% endcomment %}
+  </tr>
+  {% endfor %}
+</table>
+{% endblock content %}
