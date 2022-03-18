@@ -41,13 +41,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #defulat
+    #default
     'django.contrib.humanize',
 
     
     #localapps
     'words2.apps.Words2Config',
     'words.apps.WordsConfig',
+    'users.apps.UsersConfig',
 
     #3rd party 
     'crispy_forms',
@@ -174,6 +175,9 @@ SHELL_PLUS = "ipython"
 SHELL_PLUS_DONT_LOAD = ['words2']
 MICROSOFT_TRANSLATE_XRAPID_API_KEY = os.environ.get('MICROSOFT_TRANSLATE_XRAPID_API_KEY')
 
+AUTH_USER_MODEL = 'users.CustomUser'
+LOGIN_REDIRECT_URL = 'words:word_create'
+LOGOUT_REDIRECT_URL = 'words:word_cards'
 
 # For using models in the notebook
 # import os

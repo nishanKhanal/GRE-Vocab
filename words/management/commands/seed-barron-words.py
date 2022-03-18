@@ -16,7 +16,7 @@ class Command(BaseCommand):
             raise CommandError("Limit must be positive")
         
         if options['delete_all']:
-            Word.objects.filter(source__name = "Barron").delete()
+            Word.objects.filter(sources__name = "Barron").delete()
 
         else:
 
@@ -77,7 +77,8 @@ class Command(BaseCommand):
                         used_terms = match[4]
                     except:
                         used_terms = None
-                    Word.objects.create(word=match[0].lower(),part_of_speech=match[1][:match[1].index('.')+1], meaning= match[2], example=match[3],frequent= True if '*' in match[0] else False,terms_from_arts_sciences_and_social_sciences = used_terms, unit = int(match[1][match[1].index('.')+1:]),source = barron)
+                    word = Word.objects.create(word=match[0].lower(),part_of_speech=match[1][:match[1].index('.')+1], meaning= match[2], example=match[3],frequent= True if '*' in match[0] else False,terms_from_arts_sciences_and_social_sciences = used_terms, unit = int(match[1][match[1].index('.')+1:]))
+                    word.sources.add(barron)
                 except Exception as e:
                     print(e)
                     print(match)

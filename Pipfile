@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-django = "*"
+django = "==3.1"
 django-crispy-forms = "*"
 django-select2 = "*"
 django-redis = "*"
@@ -19,6 +19,7 @@ whitenoise = "*"
 python-dotenv = "*"
 django-heroku = "*"
 django-cloudinary-storage = "*"
+django-filter = "*"
 
 [dev-packages]
 ipykernel = "*"

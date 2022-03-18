@@ -32,7 +32,8 @@ class WordCreateForm(forms.ModelForm):
     terms_from_arts_sciences_and_social_sciences = forms.CharField(label="Used Terms", widget=forms.Textarea(attrs=style_attributes),required=False)
     word_translation = forms.CharField(label="Word Translation",max_length=250, widget=forms.TextInput(attrs=style_attributes),required=False)
     meaning_translation = forms.CharField(label="Meaning Translation",max_length=250, widget=forms.TextInput(attrs=style_attributes),required=False)
-    difficulty = forms.IntegerField(label="Difficulty", widget=forms.TextInput(attrs=style_attributes), required=True)
+    hint = forms.CharField(label="Hint", widget=forms.TextInput(attrs=style_attributes),required=False)
+    difficulty = forms.IntegerField(label="Difficulty", widget=forms.NumberInput(attrs=style_attributes),required=True)
 
     class Meta:
         style_attributes = {'style': "background-color: black; text-color: black; margin-bottom: 30px;"}
@@ -42,7 +43,7 @@ class WordCreateForm(forms.ModelForm):
         widgets = {
             "synonyms": SynonymsWidget,
             "antonyms": s2forms.Select2MultipleWidget(attrs={'class' : 'bg-dark text-white'}),
-            "source": s2forms.Select2Widget(attrs={'class' : 'bg-dark text-white'}),
+            "sources": s2forms.Select2MultipleWidget(attrs={'class' : 'bg-dark text-white'}),
         }
 
     def __init__(self, *args, **kwargs):

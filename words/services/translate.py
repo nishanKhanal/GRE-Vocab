@@ -5,8 +5,10 @@ def translate(word):
     url = "https://microsoft-translator-text.p.rapidapi.com/translate"
 
     querystring = {"from": "en","to":"ne","api-version":"3.0","profanityAction":"NoAction","textType":"plain"}
+    w = word.word if "*" not in word.word else word.word[:-1]
+    print(f"jpt: {w}")
     payload = [
-        {'Text': word.word},
+        {'Text': w},
         {'Text': word.meaning}
     ]
     payload = str(json.dumps(payload))

@@ -18,7 +18,7 @@ class ModelWithTimeStamp(models.Model):
 
 class Source(ModelWithTimeStamp):
     name = models.CharField(max_length=100)
-
+    remarks = models.TextField(null=True, blank=True)
     def __str__(self):
         return self.name
 
@@ -33,11 +33,12 @@ class Word(ModelWithTimeStamp):
     antonyms = models.ManyToManyField('self', related_name="antomyms", blank=True)
     example = models.TextField(blank=True)
     terms_from_arts_sciences_and_social_sciences = models.TextField(blank=True, null=True, default=None)
-    source = models.ForeignKey(Source, related_name="words", on_delete=models.DO_NOTHING,blank=True,null=True)
+    sources = models.ManyToManyField(Source, related_name="words",blank=True)
     word_translation = models.CharField(max_length=250,blank=True)
     meaning_translation = models.CharField(max_length=250,blank=True)
     difficulty = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)], default=1)
     last_read_at = models.DateTimeField(null=True, blank=True)
+    hint = models.CharField(max_length=255,blank=True,null=True)
     image = models.ImageField(upload_to='images/', height_field=None, width_field=None,blank=True, null=True)
 
 

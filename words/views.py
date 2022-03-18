@@ -5,6 +5,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.utils import timezone
 from django.db.models import Q
 from django.http import HttpResponseRedirect
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 import requests, json
 
@@ -12,6 +13,8 @@ from .models import Word
 from .forms import WordCreateForm
 from .tables import WordTable
 from .services.translate import translate
+
+from .filters import WordFilter
 # Create your views here.
 
 class WordListView(generic.ListView):
@@ -25,33 +28,52 @@ class WordCardView(generic.ListView):
     template_name = "words/word_cards.html"
     paginate_by = 20
 
+
+
+    def get_context_data(self, **kwargs):
+        context = super(WordCardView, self).get_context_data()
+        wordFilter = WordFilter(self.request.GET, self.get_queryset())   
+        context['query_string'] = self.request.GET
+        context['wordFilter'] = wordFilter
+        return context
+
     def get_queryset(self):
+        object_list = self.model.objects.all()
         search_term = self.request.GET.get('search_term', '')
-        object_list = self.model.objects.filter(source__name__icontains = "Barron")
+        sort_by = self.request.GET.get('sort_by', '')
+        sort_order = self.request.GET.get('sort_order', '')
+        if sort_by:
+            if sort_order == "reverse":
+                sort_by = "-"+sort_by
+            object_list = object_list.order_by(sort_by)
         if search_term:
             object_list = object_list.filter(Q(word__icontains=search_term)| Q(meaning__icontains=search_term))
-        return object_list
+
+        wordFilter = WordFilter(self.request.GET,object_list)
+        return wordFilter.qs
 
 class WordCardViewExtra(WordCardView):
     def get_queryset(self):
-        object_list = self.model.objects.exclude(source__name__icontains = "Barron")
+        object_list = self.model.objects.exclude(sources__name__icontains = "Barron")
         return object_list
 
 
-class WordCreateView(generic.CreateView):
+class WordCreateView(LoginRequiredMixin,generic.CreateView):
     model = Word
     form_class = WordCreateForm
+    login_url = reverse_lazy("login")
     template_name = "words/word_create.html"
     success_url = reverse_lazy('words:word_cards')
 
-    def get_context_data(self):
+    def get_context_data(self, **kwargs):
         context = super(WordCreateView, self).get_context_data()
         context['action'] = "Add"
         return context
 
-class WordUpdateView(generic.UpdateView):
+class WordUpdateView(LoginRequiredMixin,generic.UpdateView):
     model = Word
     form_class = WordCreateForm
+    login_url = reverse_lazy("login")
     template_name = "words/word_create.html"
     success_url = reverse_lazy('words:word_cards')
 
@@ -60,7 +82,8 @@ class WordUpdateView(generic.UpdateView):
         context['action'] = "Update"
         return context
 
-class WordPartialUpdateView(generic.View):
+class WordPartialUpdateView(LoginRequiredMixin,generic.View):
+    login_url = reverse_lazy("login")
     def post(self, request, pk):
         word = get_object_or_404(Word,id=pk)
         word.difficulty = request.POST.get('difficulty',word.difficulty)
@@ -71,7 +94,6 @@ class WordPartialUpdateView(generic.View):
 
         word.save();
         next = request.POST.get('next','')
-        print(next)
         return HttpResponseRedirect(next)
 
 class WordDetailView(generic.DetailView):
@@ -79,7 +101,8 @@ class WordDetailView(generic.DetailView):
     template_name = "words/word_detail.html"
     context_object_name = "word"
 
-class WordDeleteView(generic.DeleteView):
+class WordDeleteView(LoginRequiredMixin, generic.DeleteView):
+    login_url = reverse_lazy("login")
     model = Word
     success_url = reverse_lazy("words:word_cards")
 

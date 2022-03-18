@@ -18,10 +18,14 @@ from django.urls import path, include
 
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth.views import LoginView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("select2/", include("django_select2.urls")),
+    path('users/login/', LoginView.as_view(redirect_authenticated_user=True), name='login'),
+    path('users/', include('users.urls')),
+    path('users/',include('django.contrib.auth.urls')),
     path('', include("words.urls")),
     path('words2/', include("words2.urls")),
     path('table/', include("table.urls")),
