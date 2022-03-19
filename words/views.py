@@ -84,6 +84,10 @@ class WordUpdateView(LoginRequiredMixin,generic.UpdateView):
 
 class WordPartialUpdateView(LoginRequiredMixin,generic.View):
     login_url = reverse_lazy("login")
+
+    def get(self,request, pk):
+        return HttpResponseRedirect("/")
+
     def post(self, request, pk):
         word = get_object_or_404(Word,id=pk)
         word.difficulty = request.POST.get('difficulty',word.difficulty)

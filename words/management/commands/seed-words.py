@@ -4,21 +4,25 @@ import re
 
 
 class Command(BaseCommand):
-    help = "seed database with words from Barron"
+    help = "seed database with words"
 
     def add_arguments(self, parser):
-        parser.add_argument("--limit", type=int , default=50, help="Number of Words to be inserted")
-        parser.add_argument("--delete_all", action="store_true", help="Delete All words from Barron")
+        parser.add_argument("-l","--limit", type=int , default=101, help="Number of Words to be inserted")
+        parser.add_argument("-s","--source", type=str , help="Number of Words to be inserted")
+        parser.add_argument("-d","--delete_all", action="store_true", help="Delete All words from Barron")
 
     def handle(self, *args, **options):
         
         if options['limit'] < 0:
             raise CommandError("Limit must be positive")
         
-        if options['delete_all']:
-            Word.objects.filter(sources__name = "Barron").delete()
-
-        else:
+        if not options['source']:
+            raise CommandError("Source must not be empty")
+        if options['source'].lower() == "barron":
+            
+            if options['delete_all']:
+                Word.objects.filter(sources__name = "Barron").delete()
+                return
 
             with open('words/resources/barron_text_book.txt','r') as barron_text_book:
                 string = barron_text_book.read()
@@ -82,3 +86,22 @@ class Command(BaseCommand):
                 except Exception as e:
                     print(e)
                     print(match)
+            return
+
+        if options['source'].lower() == "101frequentwords":
+            if options['delete_all']:
+                Word.objects.filter(sources__name = "101 Frequent Words").delete()
+                return
+            from bs4 import BeautifulSoup
+
+            with open("words/resources/101_frequent_words.xml") as xmlfile:
+                soup = BeautifulSoup(xmlfile, 'html.parser')
+                frequentWords101, created = Source.objects.get_or_create(name="101 Frequent Words")
+                
+                for data in soup.findAll('data'):
+                    word = Word.objects.create(word=data.word.text.lower(),part_of_speech=data.pos.text.lower(), meaning=data.meaning.text.lower(),example=data.example.text.lower())
+                    word.sources.add(frequentWords101)
+            return
+        else:
+            raise CommandError("Please enter a valid Source")
+

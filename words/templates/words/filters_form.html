@@ -13,6 +13,7 @@
                         <option value="word" {% if query_string.sort_by == "word"%} selected {% endif %} default>Alphabetically</option>
                         <option value="last_read_at" {% if query_string.sort_by == "last_read_at"%} selected {% endif %}>Last Read</option>
                         <option value="difficulty" {% if query_string.sort_by == "difficulty"%} selected {% endif %}>Difficulty</option>
+                        <option value="created_at" {% if query_string.sort_by == "created_at"%} selected {% endif %}>Created At</option>
                     </select>
                 </div>
                 <div class="form-group col-2 pt-4">
