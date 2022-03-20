@@ -1,7 +1,6 @@
 {% load crispy_forms_tags%}
 <div class="row">
-
-    <div class="{{ collapse }}" id="collapseExample">
+    <div class="{{ collapse }}" id="{% if collapse %}collapseExample{% endif %}">
         <form action="">
             {{ wordFilter.form|crispy }}
             <hr>
