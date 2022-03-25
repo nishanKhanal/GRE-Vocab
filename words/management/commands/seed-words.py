@@ -10,6 +10,7 @@ class Command(BaseCommand):
         parser.add_argument("-l","--limit", type=int , default=101, help="Number of Words to be inserted")
         parser.add_argument("-s","--source", type=str , help="Number of Words to be inserted")
         parser.add_argument("-d","--delete_all", action="store_true", help="Delete All words from Barron")
+        parser.add_argument("-e","--extra",type=bool, help="Seed extra frequent words from barron")
 
     def handle(self, *args, **options):
         
@@ -81,11 +82,13 @@ class Command(BaseCommand):
                         used_terms = match[4]
                     except:
                         used_terms = None
-                    word = Word.objects.create(word=match[0].lower(),part_of_speech=match[1][:match[1].index('.')+1], meaning= match[2], example=match[3],frequent= True if '*' in match[0] else False,terms_from_arts_sciences_and_social_sciences = used_terms, unit = int(match[1][match[1].index('.')+1:]))
+                    word = Word.objects.create(word=match[0].lower()[:-1] if "*" in match[0].lower() else match[0].lower(),part_of_speech=match[1][:match[1].index('.')+1], meaning= match[2], example=match[3],frequent= True if '*' in match[0] else False,terms_from_arts_sciences_and_social_sciences = used_terms, unit = int(match[1][match[1].index('.')+1:]))
                     word.sources.add(barron)
                 except Exception as e:
                     print(e)
                     print(match)
+
+           
             return
 
         if options['source'].lower() == "101frequentwords":
@@ -97,11 +100,37 @@ class Command(BaseCommand):
             with open("words/resources/101_frequent_words.xml") as xmlfile:
                 soup = BeautifulSoup(xmlfile, 'html.parser')
                 frequentWords101, created = Source.objects.get_or_create(name="101 Frequent Words")
-                
+                separator = ";;\n\n"
                 for data in soup.findAll('data'):
-                    word = Word.objects.create(word=data.word.text.lower(),part_of_speech=data.pos.text.lower(), meaning=data.meaning.text.lower(),example=data.example.text.lower())
+                    word, created = Word.objects.get_or_create(word=data.word.text.lower())
+                    if word.part_of_speech != data.pos.text.lower():
+                        word.part_of_speech += f"{';' if not created else ''}{data.pos.text.lower()}"
+                    word.meaning += f"{separator if not created else ''}{data.meaning.text.lower()}"
+                    word.example += f"{separator if not created else ''}{data.example.text.lower()}"
                     word.sources.add(frequentWords101)
+                    word.save()
             return
+
+        if options['source'].lower() == "barronextrafrequent":
+             # For extra frequent words
+            from bs4 import BeautifulSoup
+            with open("words/resources/barron_extra_frequent.xml") as xmlfile:
+                soup = BeautifulSoup(xmlfile, 'html.parser')
+                # print(soup.prettify())
+                all_data = soup.findAll('data')
+                separator = ";;\n\n"
+                barron, source_created = Source.objects.get_or_create(name="Barron")
+                for data in soup.findAll('data'):
+                    try:
+                        word, created = Word.objects.get_or_create(word=data.word.text)
+                        if word.meaning != data.meaning.text.lower():
+                            word.meaning += f"{separator if not created else ''}{data.meaning.text.lower()}"
+                        word.frequent = True
+                        if created:
+                            word.sources.add(barron)
+                        word.save()
+                    except Exception as e:
+                        print(e)
         else:
             raise CommandError("Please enter a valid Source")
 

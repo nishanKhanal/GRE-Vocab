@@ -1,7 +1,7 @@
 {% extends "base.html" %} 
 {% load crispy_forms_tags %} 
 
-{% block title %} New Word {% endblock title %} 
+{% block title %} {% if action|lower == "update" %} Edit {% else %} New Word {% endif %} {% endblock title %} 
 
 {% block style %} 
     {{ form.media.css }}
@@ -34,7 +34,7 @@
 {% endblock style %} 
 
 {% block content %}
-    <h2 style="margin: 3vh 0">Add a New Word</h2>
+    <h2 style="margin: 3vh 0">{% if action|lower == "update" %} Edit Word {% else %} Add a New Word {% endif %}</h2>
     <form enctype="multipart/form-data" action="" method="post">
     {% csrf_token %} 
     {{ form|crispy}}
