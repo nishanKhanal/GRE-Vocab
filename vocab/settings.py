@@ -14,7 +14,9 @@ from pathlib import Path
 
 import os
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv()  # for development
+# PROJECT_FOLDER = os.path.expanduser('~/') # For pythonanywhere production
+# load_dotenv(os.path.join(PROJECT_FOLDER, '.env')) # for pythonanywhere production
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -140,8 +142,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'static'
-STATIC_ROOT = BASE_DIR/ 'staticfiles'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / 'static'
 ]
@@ -191,5 +192,6 @@ LOGOUT_REDIRECT_URL = 'words:word_cards'
 if os.environ.get('PRODUCTION') == "True":
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
-    import django_heroku
-    django_heroku.settings(locals())
+    if os.environ.get("HEROKU") == "True":
+        import django_heroku
+        django_heroku.settings(locals())
